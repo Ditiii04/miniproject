@@ -1,33 +1,61 @@
 package miniproject;
 
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.chrome.ChromeDriver;
 
-import java.time.Duration;
-
-public class AccountCreateTest {
-
-    private final WebDriver webDriver = new ChromeDriver();
-
-    @BeforeEach
-    void initDriver() {
-        webDriver.manage().timeouts().implicitlyWait(Duration.ofSeconds(2));
-    }
+public class AccountCreateTest extends BaseUiTest {
 
     @Test
     void testAccountCreation() {
-        webDriver.get(PageType.HOME.getUrl());
-        var homePage = new HomePage(webDriver);
-        homePage.tryAcceptConsent();
-        homePage.openRegisterPage();
-        Assertions.assertEquals("Create New Customer Account", webDriver.getTitle());
+        try {
+            webDriver.get(PageType.HOME.getUrl());
 
-        var accountPage = new AccountPage(webDriver);
-        accountPage.fillFirstName("Bomba");
-        accountPage.fillMiddleName("Gragos");
+            var homePage = new HomePage(webDriver);
+            homePage.tryAcceptConsent();
+            homePage.openRegisterPage();
+
+            Assertions.assertEquals(
+                    PageType.CREATE_ACCOUNT.getTitle(),
+                    webDriver.getTitle(),
+                    "Create Account page title did not match"
+            );
+
+            var accountPage = new AccountPage(webDriver);
+
+            accountPage.fillFirstName("Test");
+            accountPage.fillMiddleName("Selenium");
+            accountPage.fillLastName("Automation");
+
+            String email = "test" + System.currentTimeMillis() + "@mail.com";
+            accountPage.fillEmail(email);
+
+            // save email for Test 2
+            CredentialStore.saveEmail(email);
+
+            accountPage.fillPassword("Password123!");
+            accountPage.fillConfirmPassword("Password123!");
+
+            accountPage.submit();
+
+            Assertions.assertTrue(
+                    accountPage.isSuccessMessageDisplayed(),
+                    "Success message should be displayed after account creation"
+            );
+
+            Assertions.assertEquals("My Account", webDriver.getTitle());
+            Assertions.assertTrue(
+                    webDriver.getCurrentUrl().contains("/customer/account/"),
+                    "URL should contain /customer/account/ after successful registration"
+            );
+
+            accountPage.logout();
+
+        } catch (AssertionError e) {
+            markTestFailed();
+            throw e;
+        } catch (RuntimeException e) {
+            markTestFailed();
+            throw e;
+        }
     }
-
 }
