@@ -31,30 +31,41 @@ public class SignInTest extends BaseUiTest {
             loginPage.fillPassword(password);
             loginPage.submitLogin();
 
-            // 4. Verify we are logged in as that user:
-            //    - My Account title
-            //    - URL contains /customer/account/
+            // 4a. Verify we are on My Account page
             Assertions.assertEquals(
                     "My Account",
                     webDriver.getTitle(),
                     "After login, title should be 'My Account'"
             );
 
+            String currentUrl = webDriver.getCurrentUrl();
+            Assertions.assertNotNull(currentUrl, "Current URL should not be null after login");
             Assertions.assertTrue(
-                    webDriver.getCurrentUrl().contains("/customer/account/"),
+                    currentUrl.contains("/customer/account/"),
                     "After login, URL should contain /customer/account/"
             );
 
-            // If you still want to try welcome text later, you can print it:
-            // System.out.println("Welcome block HTML: " + webDriver.getPageSource());
+            // 4b. Check your username is displayed on right corner of the page
+            String welcomeText = loginPage.getWelcomeMessageText();
+            System.out.println("Welcome text: " + welcomeText);
+
+            String expectedFirstName = "Test";
+            String expectedMiddleName = "Selenium";
+            String expectedLastName = "Automation";
+
+            String upperWelcome = welcomeText.toUpperCase();
+
+            Assertions.assertTrue(
+                    upperWelcome.contains(expectedFirstName.toUpperCase()) &&
+                            upperWelcome.contains(expectedMiddleName.toUpperCase()) &&
+                            upperWelcome.contains(expectedLastName.toUpperCase()),
+                    "Header welcome text should contain first, middle and last name. Actual: " + welcomeText
+            );
 
             // 5. Click on Account and Log Out
             loginPage.logout();
 
-        } catch (AssertionError e) {
-            markTestFailed();
-            throw e;
-        } catch (RuntimeException e) {
+        } catch (AssertionError | RuntimeException e) {
             markTestFailed();
             throw e;
         }

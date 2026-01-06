@@ -58,6 +58,18 @@ public abstract class BasePage {
         webDriver.findElement(org.openqa.selenium.By.linkText("Log In")).click();
     }
 
+    // ===== Women navigation =====
+    private static final By womenMenuBy = By.linkText("WOMEN");              // adjust to actual text/case
+    private static final By viewAllWomenBy = By.linkText("View All Women");  // submenu option
+
+    public void openAllWomenPage() {
+        var actions = new org.openqa.selenium.interactions.Actions(webDriver);
+        var womenMenu = webDriver.findElement(womenMenuBy);
+
+        actions.moveToElement(womenMenu).perform();
+        webDriver.findElement(viewAllWomenBy).click();
+    }
+
 
     // ===== Privacy consent =====
 

@@ -9,6 +9,10 @@ public class LoginPage extends BasePage {
     private static final By passwordBy = By.id("pass");
     private static final By loginButtonBy = By.id("send2");
 
+    // your header welcome element (right corner)
+    private static final By welcomeMessageBy =
+            By.cssSelector("body > div.wrapper > div > div.header-language-background > div > p");
+
     private static final long TYPING_DELAY_MS = 75;
 
     public LoginPage(WebDriver webDriver) {
@@ -25,5 +29,13 @@ public class LoginPage extends BasePage {
 
     public void submitLogin() {
         slowClick(loginButtonBy, 200);
+    }
+
+    public String getWelcomeMessageText() {
+        try {
+            return webDriver.findElement(welcomeMessageBy).getText();
+        } catch (Exception e) {
+            return "";
+        }
     }
 }
