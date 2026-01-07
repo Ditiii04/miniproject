@@ -2,13 +2,15 @@ package miniproject;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
+import org.openqa.selenium.support.Color;
 
 public class HoverStyleTest extends BaseUiTest {
 
     @Test
-    void testProductHoverStyleChanges() {
+    void testProductNameColorChangesOnHover() {
         try {
             // Precondition: Sign in
             webDriver.get(PageType.HOME.getUrl());
@@ -32,53 +34,45 @@ public class HoverStyleTest extends BaseUiTest {
 
             Assertions.assertEquals("My Account", webDriver.getTitle());
 
-            // 1. Hover over Women and click View All Women
+            // Go to Women page
             homePage.openAllWomenPage();
 
-            // 2. Hover over one of the displayed products (first product container)
             var womenPage = new WomenPage(webDriver);
-            WebElement product = womenPage.getFirstProduct();
+            WebElement nameLink = womenPage.getFirstProductNameLink();
 
             Assertions.assertTrue(
-                    product.isDisplayed(),
-                    "Product should be visible before hover"
+                    nameLink.isDisplayed(),
+                    "Product name link should be visible before hover"
             );
 
+            // 1) Scroll with JS so we are 100% in viewport
+            ((JavascriptExecutor) webDriver)
+                    .executeScript("arguments[0].scrollIntoView({block: 'center'});", nameLink);
+
+            // 2) Read color before hover
+            String colorBefore = nameLink.getCssValue("color");
+            String hexBefore = Color.fromString(colorBefore).asHex();
+            System.out.println("Name link color BEFORE hover: " + colorBefore + " | hex: " + hexBefore);
+
+            // 3) Hover the text
             Actions actions = new Actions(webDriver);
-            actions.scrollToElement(product).perform();
+            actions.moveToElement(nameLink).perform();
 
-            // Capture styles before hover
-            String borderBefore = product.getCssValue("border");
-            String boxShadowBefore = product.getCssValue("box-shadow");
-            String backgroundBefore = product.getCssValue("background-color");
-            String opacityBefore = product.getCssValue("opacity");
+            // 4) Read color after hover
+            String colorAfter = nameLink.getCssValue("color");
+            String hexAfter = Color.fromString(colorAfter).asHex();
+            System.out.println("Name link color AFTER hover: " + colorAfter + " | hex: " + hexAfter);
 
-            System.out.println("Styles before hover:");
-            System.out.println("  Border: " + borderBefore);
-            System.out.println("  Box Shadow: " + boxShadowBefore);
-            System.out.println("  Background: " + backgroundBefore);
-            System.out.println("  Opacity: " + opacityBefore);
+            // 5) Assert the text color changed
+            Assertions.assertNotEquals(
+                    hexBefore,
+                    hexAfter,
+                    "Product name text color should change on hover"
+            );
 
-            // Perform hover
-            actions.moveToElement(product).perform();
-
-            // Re-read styles after hover (no sleep, no fragile wait)
-            String borderAfter = product.getCssValue("border");
-            String boxShadowAfter = product.getCssValue("box-shadow");
-            String backgroundAfter = product.getCssValue("background-color");
-            String opacityAfter = product.getCssValue("opacity");
-
-            System.out.println("Styles after hover:");
-            System.out.println("  Border: " + borderAfter);
-            System.out.println("  Box Shadow: " + boxShadowAfter);
-            System.out.println("  Background: " + backgroundAfter);
-            System.out.println("  Opacity: " + opacityAfter);
-
-            // 3. Assert that hover was performed on a visible product.
-            // (On this page, styles may remain the same; the important part is the hover action.)
             Assertions.assertTrue(
-                    product.isDisplayed(),
-                    "Product should remain visible after hover"
+                    nameLink.isDisplayed(),
+                    "Product name link should remain visible after hover"
             );
 
             womenPage.logout();

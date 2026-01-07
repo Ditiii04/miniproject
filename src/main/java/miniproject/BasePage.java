@@ -70,6 +70,32 @@ public abstract class BasePage {
         webDriver.findElement(viewAllWomenBy).click();
     }
 
+    // ===== Men navigation =====
+    private static final By menMenuBy = By.linkText("MEN");
+    private static final By viewAllMenBy = By.linkText("View All Men");
+
+    public void openAllMenPage() {
+        var actions = new org.openqa.selenium.interactions.Actions(webDriver);
+        var menMenu = webDriver.findElement(menMenuBy);
+
+        actions.moveToElement(menMenu).perform();
+        webDriver.findElement(viewAllMenBy).click();
+    }
+
+
+    // ===== Sale navigation =====
+    private static final By saleMenuBy = By.linkText("SALE");
+    private static final By viewAllSaleBy = By.linkText("View All Sale");
+
+    public void openAllSalePage() {
+        var actions = new org.openqa.selenium.interactions.Actions(webDriver);
+        var saleMenu = webDriver.findElement(saleMenuBy);
+
+        actions.moveToElement(saleMenu).perform();
+        webDriver.findElement(viewAllSaleBy).click();
+    }
+
+
 
     // ===== Privacy consent =====
 
