@@ -62,25 +62,32 @@ public abstract class BasePage {
         webDriver.findElement(org.openqa.selenium.By.linkText("Log In")).click();
     }
 
-    // Open Account dropdown safely (handles stale + scroll)
+    /// Open Account dropdown safely (handles stale + scroll)
     public void openAccountDropdown() {
         var wait = new WebDriverWait(webDriver, Duration.ofSeconds(5));
-        wait.until(d -> d.findElement(accountLabelBy).isDisplayed());
 
         for (int i = 0; i < 2; i++) {
             try {
-                WebElement accountLabel = webDriver.findElement(accountLabelBy);
+                // Always find a FRESH element
+                WebElement accountLabel = wait.until(d ->
+                        d.findElement(accountLabelBy)
+                );
+
                 ((org.openqa.selenium.JavascriptExecutor) webDriver)
                         .executeScript("arguments[0].scrollIntoView({block: 'center'});", accountLabel);
+
                 accountLabel.click();
                 return;
+
             } catch (org.openqa.selenium.StaleElementReferenceException e) {
                 if (i == 1) {
                     throw e;
                 }
+                // loop will retry with a fresh find
             }
         }
     }
+
 
     // ===== Women navigation =====
     private static final By womenMenuBy = By.linkText("WOMEN");
