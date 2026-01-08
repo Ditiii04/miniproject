@@ -27,6 +27,10 @@ public abstract class BasePage {
 
     private static final By logoutAnchorBy = By.linkText("Log Out");
 
+    // Label span inside Account link (for safe open)
+    private static final By accountLabelBy =
+            By.cssSelector("#header > div > div.skip-links > div > a > span.label");
+
     // ===== Messages =====
     private static final By successMessageBy =
             By.cssSelector("li.success-msg span");
@@ -58,9 +62,29 @@ public abstract class BasePage {
         webDriver.findElement(org.openqa.selenium.By.linkText("Log In")).click();
     }
 
+    // Open Account dropdown safely (handles stale + scroll)
+    public void openAccountDropdown() {
+        var wait = new WebDriverWait(webDriver, Duration.ofSeconds(5));
+        wait.until(d -> d.findElement(accountLabelBy).isDisplayed());
+
+        for (int i = 0; i < 2; i++) {
+            try {
+                WebElement accountLabel = webDriver.findElement(accountLabelBy);
+                ((org.openqa.selenium.JavascriptExecutor) webDriver)
+                        .executeScript("arguments[0].scrollIntoView({block: 'center'});", accountLabel);
+                accountLabel.click();
+                return;
+            } catch (org.openqa.selenium.StaleElementReferenceException e) {
+                if (i == 1) {
+                    throw e;
+                }
+            }
+        }
+    }
+
     // ===== Women navigation =====
-    private static final By womenMenuBy = By.linkText("WOMEN");              // adjust to actual text/case
-    private static final By viewAllWomenBy = By.linkText("View All Women");  // submenu option
+    private static final By womenMenuBy = By.linkText("WOMEN");
+    private static final By viewAllWomenBy = By.linkText("View All Women");
 
     public void openAllWomenPage() {
         var actions = new org.openqa.selenium.interactions.Actions(webDriver);
@@ -82,7 +106,6 @@ public abstract class BasePage {
         webDriver.findElement(viewAllMenBy).click();
     }
 
-
     // ===== Sale navigation =====
     private static final By saleMenuBy = By.linkText("SALE");
     private static final By viewAllSaleBy = By.linkText("View All Sale");
@@ -95,14 +118,8 @@ public abstract class BasePage {
         webDriver.findElement(viewAllSaleBy).click();
     }
 
-
-
     // ===== Privacy consent =====
 
-    /**
-     * @return true if the privacy dialog was displayed and accepted,
-     * false if the dialog was not present
-     */
     public boolean tryAcceptConsent() {
         var wait = new WebDriverWait(webDriver, Duration.ofSeconds(3));
 
@@ -135,7 +152,6 @@ public abstract class BasePage {
     // ===== Logout (slowed down) =====
 
     public void logout() {
-        // small pause between opening dropdown and clicking logout
         slowClick(accountDropdownBy, 200);
         slowClick(logoutAnchorBy, 300);
     }
@@ -146,9 +162,6 @@ public abstract class BasePage {
         return Optional.ofNullable(webDriver.getTitle());
     }
 
-    /**
-     * Type text in a more "human" way (small delay between characters).
-     */
     protected void typeSlowly(WebElement element, String text, long delayMillis) {
         element.clear();
         for (char c : text.toCharArray()) {
@@ -162,9 +175,6 @@ public abstract class BasePage {
         }
     }
 
-    /**
-     * Perform a click with a small delay before the click to make it look slower.
-     */
     protected void slowClick(By locator, long delayMillis) {
         try {
             Thread.sleep(delayMillis);
