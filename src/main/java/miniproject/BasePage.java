@@ -5,6 +5,7 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.time.Duration;
@@ -169,6 +170,10 @@ public abstract class BasePage {
         return Optional.ofNullable(webDriver.getTitle());
     }
 
+    /**
+     * Type text slowly to simulate human typing
+     * Note: Uses Thread.sleep intentionally for character-by-character typing simulation
+     */
     protected void typeSlowly(WebElement element, String text, long delayMillis) {
         element.clear();
         for (char c : text.toCharArray()) {
@@ -182,12 +187,12 @@ public abstract class BasePage {
         }
     }
 
+    /**
+     * Click element after waiting for it to be clickable
+     */
     protected void slowClick(By locator, long delayMillis) {
-        try {
-            Thread.sleep(delayMillis);
-        } catch (InterruptedException ie) {
-            Thread.currentThread().interrupt();
-        }
-        webDriver.findElement(locator).click();
+        WebDriverWait wait = new WebDriverWait(webDriver, Duration.ofMillis(delayMillis + 1000));
+        WebElement element = wait.until(ExpectedConditions.elementToBeClickable(locator));
+        element.click();
     }
 }

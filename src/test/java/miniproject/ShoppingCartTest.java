@@ -3,105 +3,132 @@ package miniproject;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.By;
-import org.openqa.selenium.WebElement;
+
+import java.util.List;
 
 public class ShoppingCartTest extends BaseUiTest {
 
     @Test
     void testWomenSortingWishlistAndCartTotals() {
         try {
-            System.out.println("Starting test: testWomenSortingWishlistAndCartTotals()");
+            System.out.println("=== Starting Test 7: Shopping Cart Test ===");
 
-            // ===== Precondition: run full Test 6 flow on this driver =====
+            // ===== Precondition: run full Test 6 flow =====
+            System.out.println("Running Test 6 as precondition...");
             WomenFlowHelper.runWomenSortingAndWishlistFlow(webDriver);
+            System.out.println("✓ Test 6 precondition completed");
 
             // At this point:
             // - user is logged in
             // - 2 items are in wishlist
-            // - Account dropdown is open (from step 5 of Test 6)
+            // - Account dropdown is open
 
-            // ===== 1. Go to My Wishlist =====
+            // ===== Step 1: Go to My Wishlist =====
+            System.out.println("Step 1: Going to My Wishlist");
             webDriver.findElement(By.cssSelector("#header-account > div > ul > li:nth-child(2) > a"))
                     .click();
 
-// ===== 2. Add the products to the shopping cart (Select color and size) =====
+            // Wait for wishlist page to load
+            try {
+                Thread.sleep(1500);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
 
-// First wishlist product: use actual row id 3276
-            webDriver.findElement(By.cssSelector(
-                    "#item_3276 td.wishlist-cell4.customer-wishlist-item-cart p > a.link-edit"
-            )).click();
+            MyWishlistPage wishlistPage = new MyWishlistPage(webDriver);
+            int wishlistCount = wishlistPage.getWishlistItemCount();
+            System.out.println("Wishlist has " + wishlistCount + " items");
+            Assertions.assertEquals(2, wishlistCount, "Wishlist should have 2 items from Test 6");
 
-// choose color + size  (adjust swatch ids if needed)
-            webDriver.findElement(By.cssSelector("#swatch20 > span.swatch-label")).click();
-            webDriver.findElement(By.cssSelector("#swatch79 > span.swatch-label")).click();
+            // ===== Step 2: Add products to shopping cart (Select color and size) =====
+            System.out.println("Step 2: Adding wishlist products to cart with color and size");
 
-// add to cart
-            webDriver.findElement(By.cssSelector(
-                    "#product_addtocart_form > div.product-shop > div.product-options-bottom > " +
-                            "div.add-to-cart > div.add-to-cart-buttons > button"
-            )).click();
+            // Add FIRST product to cart
+            System.out.println("Adding first product to cart...");
+            wishlistPage.clickEditForItem(0);
 
-// Back to wishlist via Account dropdown
+            ProductDetailPage productPage = new ProductDetailPage(webDriver);
+            productPage.selectFirstAvailableColor();
+            productPage.selectFirstAvailableSize();
+            productPage.clickAddToCart();
+
+            System.out.println("✓ First product added to cart");
+
+            // Navigate back to wishlist
+            System.out.println("Navigating back to wishlist...");
             HomePage homePage = new HomePage(webDriver);
             homePage.openAccountDropdown();
+
+            try {
+                Thread.sleep(500);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+
             webDriver.findElement(By.cssSelector("#header-account > div > ul > li:nth-child(2) > a"))
                     .click();
 
-// Second wishlist product: row id 3277
-            webDriver.findElement(By.cssSelector(
-                    "#item_3277 td.wishlist-cell4.customer-wishlist-item-cart p > a.link-edit"
-            )).click();
+            // Wait for wishlist page to load
+            try {
+                Thread.sleep(1500);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
 
-            webDriver.findElement(By.cssSelector("#swatch22 > span.swatch-label")).click();
-            webDriver.findElement(By.cssSelector("#swatch79 > span.swatch-label")).click();
+            wishlistPage = new MyWishlistPage(webDriver);
 
-            webDriver.findElement(By.cssSelector(
-                    "#product_addtocart_form > div.product-shop > div.product-options-bottom > " +
-                            "div.add-to-cart > div.add-to-cart-buttons > button"
-            )).click();
+            // Add SECOND product to cart
+            System.out.println("Adding second product to cart...");
+            wishlistPage.clickEditForItem(0); // First item (since we might have removed the first)
 
-            // ===== 3. Open the Shopping Cart, change quantity to 2 for one product and click Update =====
+            productPage = new ProductDetailPage(webDriver);
+            productPage.selectFirstAvailableColor();
+            productPage.selectFirstAvailableSize();
+            productPage.clickAddToCart();
 
-            // If you want to follow your steps 100%, click directly in the cart table:
-            WebElement qtyInput = webDriver.findElement(By.cssSelector(
-                    "#shopping-cart-table > tbody > tr.first.odd > td.product-cart-actions > input"
-            ));
-            qtyInput.clear();
-            qtyInput.sendKeys("2");
+            System.out.println("✓ Second product added to cart");
+            System.out.println("✓ Both products added to cart with color and size selected");
 
-            WebElement updateButton = webDriver.findElement(By.cssSelector(
-                    "#shopping-cart-table > tbody > tr.first.odd > td.product-cart-actions > button"
-            ));
-            updateButton.click();
+            // ===== Step 3: Open Shopping Cart, change quantity to 2, and click Update =====
+            System.out.println("Step 3: Changing quantity to 2 for first product");
 
-            // ===== 4. Verify that the prices sum for all items is equal to Grand Total price =====
+            // We should already be in cart after adding items, but let's create page object
+            CartPage cartPage = new CartPage(webDriver);
 
-            // First row subtotal
-            String firstSubtotalText = webDriver.findElement(By.cssSelector(
-                    "#shopping-cart-table > tbody > tr.first.odd > td.product-cart-total > span"
-            )).getText();
+            // Wait for cart page to be ready
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
 
-            // Second row subtotal
-            String secondSubtotalText = webDriver.findElement(By.cssSelector(
-                    "#shopping-cart-table > tbody > tr.last.even > td.product-cart-total > span"
-            )).getText();
+            int cartCount = cartPage.getCartItemCount();
+            System.out.println("Cart has " + cartCount + " items");
+            Assertions.assertEquals(2, cartCount, "Cart should have 2 items");
 
-            // Grand total
-            String grandTotalText = webDriver.findElement(By.cssSelector(
-                    "#shopping-cart-totals-table > tfoot > tr > td:nth-child(2)"
-            )).getText();
+            // Change quantity of first item to 2
+            cartPage.setQuantityForRow(0, 2);
+            cartPage.clickUpdateForRow(0);
 
-            // Helper to parse "$150.00" -> 150.00
-            double firstSubtotal = parsePrice(firstSubtotalText);
-            double secondSubtotal = parsePrice(secondSubtotalText);
-            double grandTotal = parsePrice(grandTotalText);
+            System.out.println("✓ Updated quantity to 2 for first product");
 
-            double sum = firstSubtotal + secondSubtotal;
+            // Refresh page object after update
+            cartPage = new CartPage(webDriver);
 
-            System.out.println("First subtotal: " + firstSubtotalText + " -> " + firstSubtotal);
-            System.out.println("Second subtotal: " + secondSubtotalText + " -> " + secondSubtotal);
-            System.out.println("Sum of subtotals: " + sum);
-            System.out.println("Grand total: " + grandTotalText + " -> " + grandTotal);
+            // ===== Step 4: Verify prices sum equals Grand Total =====
+            System.out.println("Step 4: Verifying that sum of subtotals equals Grand Total");
+
+            List<Double> subtotals = cartPage.getRowSubtotals();
+            double grandTotal = cartPage.getGrandTotal();
+
+            System.out.println("Cart subtotals:");
+            double sum = 0.0;
+            for (int i = 0; i < subtotals.size(); i++) {
+                System.out.println("  Row " + i + ": $" + subtotals.get(i));
+                sum += subtotals.get(i);
+            }
+            System.out.println("Sum of subtotals: $" + sum);
+            System.out.println("Grand Total: $" + grandTotal);
 
             Assertions.assertEquals(
                     sum,
@@ -110,14 +137,12 @@ public class ShoppingCartTest extends BaseUiTest {
                     "Sum of all item subtotals should equal Grand Total"
             );
 
+            System.out.println("✓ Grand Total matches sum of subtotals");
+            System.out.println("=== Test 7 completed successfully ===");
+
         } catch (AssertionError | RuntimeException e) {
             markTestFailed();
             throw e;
         }
-    }
-
-    private double parsePrice(String txt) {
-        String numeric = txt.replace("$", "").replace(",", "").trim();
-        return Double.parseDouble(numeric);
     }
 }

@@ -11,6 +11,6 @@ public class WomenSortingTest extends BaseUiTest {
         } catch (AssertionError | RuntimeException e) {
             markTestFailed();
             throw e;
-        }
+}
     }
 }

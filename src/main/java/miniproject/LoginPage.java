@@ -2,6 +2,10 @@ package miniproject;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
+
+import java.time.Duration;
 
 public class LoginPage extends BasePage {
 
@@ -28,7 +32,17 @@ public class LoginPage extends BasePage {
     }
 
     public void submitLogin() {
-        slowClick(loginButtonBy, 200);
+        // Wait for login button to be clickable
+        WebDriverWait wait = new WebDriverWait(webDriver, Duration.ofSeconds(5));
+        var loginButton = wait.until(ExpectedConditions.elementToBeClickable(loginButtonBy));
+
+        // Scroll into view to ensure it's visible
+        ((org.openqa.selenium.JavascriptExecutor) webDriver)
+                .executeScript("arguments[0].scrollIntoView({block: 'center'});", loginButton);
+
+        // Click using JavaScript to avoid interception issues
+        ((org.openqa.selenium.JavascriptExecutor) webDriver)
+                .executeScript("arguments[0].click();", loginButton);
     }
 
     public String getWelcomeMessageText() {
