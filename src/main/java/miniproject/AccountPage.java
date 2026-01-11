@@ -13,35 +13,38 @@ public class AccountPage extends BasePage {
     private static final By confirmPasswordBy = By.id("confirmation");
     private static final By createAccountFormBy = By.id("form-validate");
 
-    // per‑character delay (in ms) to "slow down" typing
-    private static final long TYPING_DELAY_MS = 75;
-
     public AccountPage(WebDriver webDriver) {
         super(webDriver);
     }
 
     public void fillFirstName(String firstName) {
-        typeSlowly(webDriver.findElement(firstNameBy), firstName, TYPING_DELAY_MS);
+         var firstNameElement = webDriver.findElement(firstNameBy);
+         firstNameElement.sendKeys(firstName);
     }
 
     public void fillMiddleName(String middleName) {
-        typeSlowly(webDriver.findElement(middleNameBy), middleName, TYPING_DELAY_MS);
+        var middleNameElement = webDriver.findElement(middleNameBy);
+        middleNameElement.sendKeys(middleName);
     }
 
     public void fillLastName(String lastName) {
-        typeSlowly(webDriver.findElement(lastNameBy), lastName, TYPING_DELAY_MS);
+        var lastNameElement = webDriver.findElement(lastNameBy);
+        lastNameElement.sendKeys(lastName);
     }
 
     public void fillEmail(String email) {
-        typeSlowly(webDriver.findElement(emailBy), email, TYPING_DELAY_MS);
+        var emailElement = webDriver.findElement(emailBy);
+        emailElement.sendKeys(email);
     }
 
     public void fillPassword(String password) {
-        typeSlowly(webDriver.findElement(passwordBy), password, TYPING_DELAY_MS);
+        var passwordElement = webDriver.findElement(passwordBy);
+        passwordElement.sendKeys(password);
     }
 
     public void fillConfirmPassword(String password) {
-        typeSlowly(webDriver.findElement(confirmPasswordBy), password, TYPING_DELAY_MS);
+        var confirmPasswordElement = webDriver.findElement(confirmPasswordBy);
+        confirmPasswordElement.sendKeys(password);
     }
 
     public void submit() {

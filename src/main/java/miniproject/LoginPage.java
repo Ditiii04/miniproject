@@ -17,18 +17,18 @@ public class LoginPage extends BasePage {
     private static final By welcomeMessageBy =
             By.cssSelector("body > div.wrapper > div > div.header-language-background > div > p");
 
-    private static final long TYPING_DELAY_MS = 75;
-
     public LoginPage(WebDriver webDriver) {
         super(webDriver);
     }
 
     public void fillEmail(String email) {
-        typeSlowly(webDriver.findElement(emailBy), email, TYPING_DELAY_MS);
+        var emailElement = webDriver.findElement(emailBy);
+        emailElement.sendKeys(email);
     }
 
     public void fillPassword(String password) {
-        typeSlowly(webDriver.findElement(passwordBy), password, TYPING_DELAY_MS);
+        var passwordElement = webDriver.findElement(passwordBy);
+        passwordElement.sendKeys(password);
     }
 
     public void submitLogin() {

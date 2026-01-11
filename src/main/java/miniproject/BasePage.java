@@ -171,23 +171,6 @@ public abstract class BasePage {
     }
 
     /**
-     * Type text slowly to simulate human typing
-     * Note: Uses Thread.sleep intentionally for character-by-character typing simulation
-     */
-    protected void typeSlowly(WebElement element, String text, long delayMillis) {
-        element.clear();
-        for (char c : text.toCharArray()) {
-            element.sendKeys(String.valueOf(c));
-            try {
-                Thread.sleep(delayMillis);
-            } catch (InterruptedException ie) {
-                Thread.currentThread().interrupt();
-                break;
-            }
-        }
-    }
-
-    /**
      * Click element after waiting for it to be clickable
      */
     protected void slowClick(By locator, long delayMillis) {

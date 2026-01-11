@@ -13,6 +13,14 @@ public enum PageType {
             "https://ecommerce.tealiumdemo.com/",
             "Tealium Ecommerce Demo"
     ),
+    WISHLIST(
+            "https://ecommerce.tealiumdemo.com/wishlist/",
+            "My Wishlist"
+    ),
+    SHOPPING_CART(
+            "https://ecommerce.tealiumdemo.com/checkout/cart/",
+            "Shopping Cart"
+    )
     ;
 
     PageType(String url, @Nullable String title) {
