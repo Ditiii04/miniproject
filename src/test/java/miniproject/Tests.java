@@ -124,7 +124,7 @@ public class Tests extends BaseUiTest {
         loginPage.logout();
     }
 
-    @Order(2)
+    @Order(3)
     @Test
     void testProductNameColorChangesOnHover() {
         // Precondition: Sign in
@@ -193,7 +193,7 @@ public class Tests extends BaseUiTest {
         womenPage.logout();
     }
 
-    @Order(2)
+    @Order(4)
     @Test
     void testSaleProductsPriceStyles() {
         // Precondition: Sign in
@@ -297,7 +297,7 @@ public class Tests extends BaseUiTest {
         salePage.logout();
     }
 
-    @Order(2)
+    @Order(5)
     @Test
     void testMenPageFilters() {
         System.out.println("Starting test: testMenPageFilters()");
@@ -431,7 +431,7 @@ public class Tests extends BaseUiTest {
         menPage.logout();
     }
 
-    @Order(2)
+    @Order(6)
     @Test
     void womanFullFlowTest() {
         // ------------------------------ Test 6 -----------------------------------
